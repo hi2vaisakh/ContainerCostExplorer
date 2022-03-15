@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Container Cost Explorer AWS Integration
+Parameters:
+  ExternalId:
+    Description: >-
+      External ID for the Container Cost Explore role (which is generated as part of Adding Account via Cost Explorer UI. Don't 
+      Override this value.)
+    Type: String
+    ConstraintDescription: ExternalId is required.
+  IAMRoleName:
+    Description: IAM role for Container Cost Explorer AWS integration (which is generated as part of Adding Account via Cost Explorer UI. Don't 
+      Override this value.)
+    Type: String
+    ConstraintDescription: IAM Role is required.
+  CCEAWSAccountId:
+    Description: >-
+      Container Cost Explorer AWS account ID allowed to assume the integration IAM role. DO NOT CHANGE!
+    Type: String
+    Default: "738317653687"
+Resources:
+  # The IAM role for Container Cost Explorer AWS integration
+  DatadogIntegrationRoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: "https://datadog-cloudformation-template.s3.amazonaws.com/aws/datadog_integration_role.yaml"
+      Parameters:
+        ExternalId: !Ref ExternalId
+        IAMRoleName: !Ref IAMRoleName
+        CCEAWSAccountId: !Ref CCEAWSAccountId
+      Tags:
+          Key: "Name"
+          Value: "Container Cost Explorer"
+Outputs:
+  IAMRoleName:
+    Description: AWS IAM Role named to be used with the Container Cost Explorer AWS Integration 
+    Value: !Ref IAMRoleName
+  AccountId:
+    Description: AWS Account number
+    Value: !Ref "AWS::AccountId"
+  Region:
+    Description: AWS Region
+    Value: !Ref "AWS::Region"

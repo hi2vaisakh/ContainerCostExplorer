@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: IAM role for Container Cost Explorer AWS Integration
+Parameters:
+  ExternalId:
+    Description: >-
+      External ID for the Container Cost Explore role (which is generated as part of Adding Account via Cost Explorer UI. Don't 
+      Override this value.)
+    Type: String
+  IAMRoleName:
+    Description: IAM role for Container Cost Explorer AWS integration (which is generated as part of Adding Account via Cost Explorer UI. Don't 
+      Override this value.)
+    Type: String
+  CCEAWSAccountId:
+    Description: >-
+      Container Cost Explorer AWS account ID allowed to assume the integration IAM role. DO NOT CHANGE!
+    Type: String
+    Default: "738317653687"
+Resources:
+  DatadogIntegrationRole:
+    Type: 'AWS::IAM::Role'
+    Metadata:
+      cfn-lint:
+        config:
+          # cfn-lint does not yet support "Fn::Transform"
+          ignore_checks:
+          - E3002
+          - E3003
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub
+                - 'arn:aws:iam::${CCEAWSAccountId}:root'
+                - { CCEAWSAccountId: !Ref CCEAWSAccountId}
+            Action:
+              - 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': !Ref ExternalId
+      Path: /
+      RoleName: !Ref IAMRoleName
+      Policies:
+        - PolicyName: CCEAWSIntegrationPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+            - !If
+              - GrantFullPermissions
+              -
+                Effect: Allow
+                Resource: '*'
+                Action:
+                  - '*'
+              -
+                Effect: Allow
+                Resource: '*'
+                Action:
+                  - 'cloudwatch:Get*'
+                  - 'cloudwatch:List*'
+                  - 'ec2:Describe*'
+                  - 'support:*'
+                  - 'tag:GetResources'
+                  - 'tag:GetTagKeys'
+                  - 'tag:GetTagValues'

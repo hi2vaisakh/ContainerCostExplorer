@@ -22,7 +22,7 @@ Resources:
   DatadogIntegrationRoleStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: "https://datadog-cloudformation-template.s3.amazonaws.com/aws/datadog_integration_role.yaml"
+      TemplateURL: "https://github.com/hi2vaisakh/ContainerCostExplorer/blob/main/cce_integration_role.yaml"
       Parameters:
         ExternalId: !Ref ExternalId
         IAMRoleName: !Ref IAMRoleName
